@@ -27,3 +27,17 @@ jobs:
         with:
           name: build-log
           path: build.log
+
+      - name: Notify Success on Slack
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "text": "✅ *Build Succeeded* for devops-webapp\nCommit: ${{ github.sha }}\nBranch: ${{ github.ref_name }}\nTriggered by: ${{ github.actor }}"
+          }' ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Failure on Slack
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "text": "❌ *Build Failed* for devops-webapp\nCommit: ${{ github.sha }}\nBranch: ${{ github.ref_name }}\nTriggered by: ${{ github.actor }}"
+          }' ${{ secrets.SLACK_WEBHOOK_URL }}
